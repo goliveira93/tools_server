@@ -1,0 +1,263 @@
+swagger: "2.0"
+info:
+  description: |
+    API do Link de Dados.
+  version: "0.0.1"
+  title: "API do Link de Dados"
+  contact:
+    email: "quantuminfo@quantumfinance.com.br"
+host: "www.quantumaxis.com.br"
+basePath: "/apibasic/linkdados"
+produces:
+  - application/json; charset=utf-8
+securityDefinitions:
+  basicAuth:
+    type: basic
+security:
+  - basicAuth: []
+schemes:
+  - https
+paths:
+  /v1/qtlink:
+    get:
+      summary: "Busca o resultado de alguma funcionalidade do Quantum Axis a partir de um grupo de ativos e um arquivo de configurações."
+      description: |
+        Recebe um grupo de ativos, um arquivo de configurações e outros parâmetros opcionais e retorna a lista de resultados para a funcionalidade solicitada.
+      parameters:
+        - in: "header"
+          name: "Accept-Encoding"
+          description: "Encoding application/gzip a ser utilizada nos resultados serem comprimidos."
+          required: true
+          default: "application/gzip"
+          type: "string"
+        - in: "query"
+          name: "funcionalidade"
+          description: "A funcionalidade que será consultada."
+          required: true
+          type: "string"
+          enum:
+            - "RELATORIO"
+            - "SERIES"
+            - "ANÁLISE DE EMPRESAS"
+            - "CARTEIRA"
+        - in: "query"
+          name: "selecao"
+          description: "Nome do grupo de ativos ou o nome de um ativo."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "configuracao"
+          description: "Nome do arquivo de configurações."
+          required: true
+          type: "string"
+        - in: "query"
+          name: "data base"
+          description: "Define a data base de todas as medidas quantitativas (apenas para a funcionalidade Relatório)."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "acoes"
+          description: "Exibe ou oculta as ações no resultado (apenas para a funcionalidade Análise de Empresas)."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "empresas"
+          description: "Exibe ou oculta as empresas no resultado (apenas para a funcionalidade Análise de Empresas)."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "ativo"
+          description: "Define o tipo do ativo que será utilizado, no caso da utilização do nome de um ativo ao invés do nome de um grupo de ativos."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "overview"
+          description: "Define a tabela de resultado que será exibida ao invés da comparativa (apenas para a funcionalidade Análise de Empresas)."
+          required: false
+          type: "string"
+          enum:
+            - "QUANTIDADE DE AÇÕES"
+            - "MERCADO"
+            - "FINANCEIRO"
+        - in: "query"
+          name: "tipoResultadoCarteira"
+          description: "Tipo de resultado de carteira (apenas para a funcionalidade Carteira)."
+          required: false
+          type: "string"
+          enum:
+            - "COMPOSICAO_COMPLETA"
+            - "MOVIMENTACAO_DAS_CARTEIRAS"
+            - "CONSOLIDADA_COMPLETA"
+            - "CONSOLIDADA_POR_FUNDOS"
+      responses:
+        '200':
+          description: "Lista de resultados."
+          schema:
+            type: "object"
+            description: "Objeto que representa a formatação de resultado."
+            required: [headers,valores,colunas,locale,linhas]
+            properties:
+              headers:
+                type: "array"
+                items:
+                  properties:
+                    formatacao:
+                      type: "string"
+                      enum:
+                      -  "TEXTO"
+                      -  "PORCENTAGEM"
+                      -  "MOEDA"
+                      -  "DECIMAL"
+                      -  "DATA"
+                      -  "DIA_MES"
+                      -  "CNPJ"
+                      -  "INTEIRO"
+                      -  "PORCENTAGEM_TAXAS"
+                      -  "MOEDA_QUALITATIVA"
+                      -  "PORCENTAGEM_TAXAS_SEM_TEXTO"
+                    moeda:
+                      type: "string"
+                    casasDecimais:
+                      type: "integer"
+              valores:
+                type: "array"
+                items:
+                  type: "array"
+                  items:
+                    description: "Os valores podem ser apenas do tipo string ou em alguns casos um objeto com a formatação de resultado."
+                    type: "string"
+              colunas:
+                type: "integer"
+              locale:
+                type: "string"
+              linhas:
+                type: "integer"
+          examples:
+            application/json:
+            - headers:
+                [
+                    {
+                        "formatacao": "TEXTO",
+                        "moeda": "BRL",
+                        "casasDecimais": null
+                    },
+                    {
+                        "formatacao": "MOEDA",
+                        "moeda": "BRL",
+                        "casasDecimais": 2
+                    },
+                    {
+                        "formatacao": "TEXTO",
+                        "moeda": "BRL",
+                        "casasDecimais": null
+                    }
+                ]
+              valores:
+                [
+                    [
+                        "Nome",
+                        "Lâmina CVM - Custo da Taxa de Resgate  - mensal (Nov/2016)",
+                        "Índice de Atualização do Plano"
+                    ],
+                    [
+                        "AAA AÇÕES FIC AÇÕES",
+                        null,
+                        ""
+                    ],
+                    [
+                        "AAA ALLOCATION FIC MULTIMERCADO",
+                        null,
+                        ""
+                    ],
+                    [
+                        "AAA LELESKE FIC MULTIMERCADO CRÉDITO PRIVADO",
+                        null,
+                        ""
+                    ],
+                    [
+                        "AAA PREVIDÊNCIA COM RENDA VARIÁVEL FI MULTIMERCADO",
+                        null,
+                        ""
+                    ]
+                ]
+              colunas: 3
+              locale: "pt_BR"
+              linhas: 5
+            - headers:
+                 [
+                     {
+                         "formatacao": "TEXTO",
+                         "moeda": "BRL",
+                         "casasDecimais": null
+                     },
+                     {
+                         "formatacao": "TEXTO",
+                         "moeda": "BRL",
+                         "casasDecimais": null
+                     },
+                     {
+                         "formatacao": "DATA",
+                         "moeda": "BRL",
+                         "casasDecimais": null
+                     },
+                     {
+                         "formatacao": "DECIMAL",
+                         "moeda": "BRL",
+                         "casasDecimais": null
+                     }
+                 ]
+              valores:
+                [
+                   [
+                       "Código",
+                       "Nome do Ativo",
+                       "Data",
+                       "Cota/Preço de Fechamento Ajustado"
+                   ],
+                   [
+                       "PETR4",
+                       "PETROBRAS PN - PETR4",
+                       "20170811",
+                       {
+                           "valor": "12.95",
+                           "formatacaoResultado": {
+                               "formatacao": "MOEDA",
+                               "moeda": "BRL",
+                               "casasDecimais": 14
+                           }
+                       }
+                   ]
+                ]
+              colunas: 4
+              locale: "pt_BR"
+              linhas: 2
+        '400':
+          description: "Mensagem de erro."
+          schema:
+            type: "object"
+            properties:
+              exceptionClass:
+                type: "string"
+              message:
+                type: "string"
+              stackTrace:
+                type: "string"
+        '500':
+          description: "Mensagem de erro."
+          schema:
+            type: "object"
+            properties:
+              exceptionClass:
+                type: "string"
+              message:
+                type: "string"
+              stackTrace:
+                type: "string"
+        '401':
+          description: "Mensagem de erro."
+          schema:
+            type: "string"
+        '403':
+          description: "Mensagem de erro."
+          schema:
+            type: "string"
